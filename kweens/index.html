@@ -419,16 +419,39 @@ function randomQueens(n) {
   return cols;
 }
 
+// Every board gets a staircase of small colors: one color with exactly 1
+// square, one with 2, one with 3. All other colors end up bigger than these.
+const STAIRCASE = [1, 2, 3];
+
 // Grow n colored regions outward from each queen until the board is full.
 // Region g is seeded at (g, sol[g]), so region g's queen is always in row g.
+// The staircase regions are grown to their exact size first and then frozen.
 function growRegions(n, sol) {
   const reg = grid(n, -1);
   const cells = [];
   for (let r = 0; r < n; r++) { reg[r][sol[r]] = r; cells.push([[r, sol[r]]]); }
+  const fixed = new Array(n).fill(false);
+  const picks = shuffle(range(n)).slice(0, STAIRCASE.length);
+  for (let i = 0; i < picks.length; i++) {
+    const g = picks[i];
+    fixed[g] = true;
+    while (cells[g].length < STAIRCASE[i]) {
+      const frontier = [];
+      for (const [r, c] of cells[g]) for (const [dr, dc] of DIRS4) {
+        const rr = r + dr, cc = c + dc;
+        if (rr >= 0 && rr < n && cc >= 0 && cc < n && reg[rr][cc] === -1) frontier.push([rr, cc]);
+      }
+      if (!frontier.length) return null;
+      const [rr, cc] = frontier[rand(frontier.length)];
+      reg[rr][cc] = g; cells[g].push([rr, cc]);
+    }
+  }
   const weight = range(n).map(() => 0.2 + Math.random() ** 2 * 2.5); // varied region sizes
-  const active = new Set(range(n));
-  let remaining = n * n - n;
+  const active = new Set(range(n).filter(g => !fixed[g]));
+  let remaining = 0;
+  for (const row of reg) for (const g of row) if (g === -1) remaining++;
   while (remaining > 0) {
+    if (!active.size) return null; // a pocket got walled off; start over
     let total = 0;
     for (const g of active) total += weight[g];
     let x = Math.random() * total, g = -1;
@@ -445,7 +468,7 @@ function growRegions(n, sol) {
     const [rr, cc] = frontier[rand(frontier.length)];
     reg[rr][cc] = g; cells[g].push([rr, cc]); remaining--;
   }
-  return reg;
+  return { reg, fixed };
 }
 
 // Find up to `limit` solutions. Always branches on the most constrained
@@ -513,10 +536,11 @@ function regionConnected(n, reg, g, sol) {
 // it (plus a path to the region's edge, and any piece that gets cut off) to a
 // neighboring region. That region now holds two of its queens, so it dies,
 // while the intended solution is untouched.
-function repair(n, reg, sol, alt) {
+function repair(n, reg, sol, alt, fixed) {
   const rows = shuffle(range(n).filter(r => alt[r] !== sol[r]));
   for (const r of rows) {
     const c = alt[r], g = reg[r][c], seed = g * n + sol[g];
+    if (fixed[g]) continue;
     const prev = new Map([[r * n + c, -1]]), q = [r * n + c];
     let end = -1, target = -1;
     for (let qi = 0; qi < q.length && end < 0; qi++) {
@@ -524,7 +548,10 @@ function repair(n, reg, sol, alt) {
       for (const [dr, dc] of shuffle(DIRS4.slice())) {
         const rr = kr + dr, cc = kc + dc, kk = rr * n + cc;
         if (rr < 0 || rr >= n || cc < 0 || cc >= n) continue;
-        if (reg[rr][cc] !== g) { end = k; target = reg[rr][cc]; break; }
+        if (reg[rr][cc] !== g) {
+          if (fixed[reg[rr][cc]]) continue;
+          end = k; target = reg[rr][cc]; break;
+        }
         if (kk !== seed && !prev.has(kk)) { prev.set(kk, k); q.push(kk); }
       }
     }
@@ -548,18 +575,22 @@ function repair(n, reg, sol, alt) {
 
 // Even out region sizes: shift border squares from big regions to smaller
 // neighbors, keeping a change only if the board still has exactly one solution.
-function rebalance(n, reg, sol, tries) {
+function rebalance(n, reg, sol, tries, fixed) {
+  const minFree = Math.max(...STAIRCASE) + 1;
   for (let t = 0; t < tries; t++) {
     const size = new Array(n).fill(0);
     for (const row of reg) for (const g of row) size[g]++;
     let best = null, bestGain = 1;
     for (let s = 0; s < 40; s++) {
       const r = rand(n), c = rand(n), a = reg[r][c];
-      if (sol[r] === c) continue;
+      if (sol[r] === c || fixed[a]) continue;
       const [dr, dc] = DIRS4[rand(4)], rr = r + dr, cc = c + dc;
       if (rr < 0 || rr >= n || cc < 0 || cc >= n) continue;
-      const b = reg[rr][cc], gain = size[a] - size[b];
-      if (b !== a && gain > bestGain) { bestGain = gain; best = [r, c, a, b]; }
+      const b = reg[rr][cc];
+      if (b === a || fixed[b] || size[a] <= minFree) continue;
+      // Colors smaller than the staircase get top priority.
+      const gain = size[a] - size[b] + (size[b] < minFree ? 1000 : 0);
+      if (gain > bestGain) { bestGain = gain; best = [r, c, a, b]; }
     }
     if (!best) continue;
     const [r, c, a, b] = best;
@@ -568,20 +599,27 @@ function rebalance(n, reg, sol, tries) {
   }
 }
 
-// Build a board with exactly one solution.
+// Build a board with exactly one solution and the 1-2-3 staircase.
 function generate(n) {
-  for (let attempt = 0; attempt < 30; attempt++) {
+  const minFree = Math.max(...STAIRCASE) + 1;
+  for (let attempt = 0; attempt < 40; attempt++) {
     const sol = randomQueens(n);
-    const reg = growRegions(n, sol);
+    const grown = growRegions(n, sol);
+    if (!grown) continue;
+    const { reg, fixed } = grown;
     for (let it = 0; it < 300; it++) {
       const sols = solve(n, reg, 2);
       if (!sols) break;
       if (sols.length === 1) {
-        rebalance(n, reg, sol, 15 * n);
-        return { regions: reg, solution: sol };
+        rebalance(n, reg, sol, 15 * n, fixed);
+        const size = new Array(n).fill(0);
+        for (const row of reg) for (const g of row) size[g]++;
+        // Only accept boards where the staircase sizes are unique to the staircase.
+        if (size.every((sz, g) => fixed[g] || sz >= minFree)) return { regions: reg, solution: sol };
+        break;
       }
       const alt = sols.find(s => s.some((c, r) => c !== sol[r]));
-      if (!alt || !repair(n, reg, sol, alt)) break;
+      if (!alt || !repair(n, reg, sol, alt, fixed)) break;
     }
   }
   return null;
@@ -600,7 +638,7 @@ const PALETTE = [
   ["#d9695f", "brick red"], ["#bcd6ef", "powder blue"], ["#7a8b3c", "olive"], ["#3f6fa8", "navy"],
 ];
 // Bump this whenever you ship a change.
-const VERSION = "1.0.0";
+const VERSION = "1.0.1";
 const MIN_N = 8, MAX_N = 16;
 const MAX_LIVES = 3, MAX_HINTS = 3;
 const TOUCH = matchMedia("(hover: none)").matches;
