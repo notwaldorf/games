@@ -237,21 +237,43 @@
   .history-row span { color: var(--ink-soft); font-weight: 600; font-size: 0.95rem; }
   .btn.small { flex: none; padding: 10px 14px; font-size: 0.95rem; background: #efe4dc; color: var(--ink); }
   .btn.small.armed { background: var(--bad); color: #fff; }
-  .diffs { display: grid; gap: 10px; margin-bottom: 14px; }
-  .diff {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  .new-wrap { position: relative; }
+  .menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 20;
+    width: max-content;
+    max-width: calc(100vw - 32px);
+    padding: 6px;
+    border-radius: 18px;
+    background: var(--card);
+    box-shadow: 0 12px 32px rgba(90, 60, 50, 0.22);
+    display: grid;
+    gap: 2px;
+    animation: drop 0.14s ease-out;
+    transform-origin: top left;
+  }
+  @keyframes drop { from { opacity: 0; transform: translateY(-4px) scale(0.98); } }
+  .menu-item {
+    display: grid;
+    grid-template-columns: 20px 1fr auto;
+    align-items: center;
+    gap: 8px;
     width: 100%;
-    padding: 16px 18px;
-    border: 2px solid transparent;
-    border-radius: 16px;
-    background: var(--tile);
+    padding: 11px 12px;
+    border: 0;
+    border-radius: 12px;
+    background: none;
     cursor: pointer;
     text-align: left;
   }
-  .diff strong { font-size: 1.15rem; font-weight: 800; }
-  .diff span { color: var(--ink-soft); font-weight: 700; font-variant-numeric: tabular-nums; }
-  .diff[aria-current="true"] { border-color: var(--ink); background: #fffaf5; }
-  .diff:active { transform: scale(0.98); }
+  .menu-item:hover, .menu-item:focus-visible { background: var(--tile); }
+  .menu-item strong { font-weight: 800; font-size: 1.05rem; }
+  .menu-item span { color: var(--ink-soft); font-weight: 700; font-size: 0.9rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .menu-item svg { width: 18px; height: 18px; visibility: hidden; }
+  .menu-item[aria-checked="true"] svg { visibility: visible; }
+  #newBtn[aria-expanded="true"] { background: var(--ink); color: #fff8f2; }
   .version { margin: 14px 0 0; font-size: 0.85rem; font-weight: 600; color: var(--ink-soft); }
   #settingsDlg { max-height: calc(100dvh - 32px); overflow-y: auto; }
   .btn {
@@ -355,9 +377,16 @@
       <button class="round" id="restartBtn" aria-label="Restart this board" title="Restart this board">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v5h5"/></svg>
       </button>
-      <button class="round" id="newBtn" aria-label="New board" title="New board" aria-haspopup="dialog">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-      </button>
+      <div class="new-wrap">
+        <button class="round" id="newBtn" aria-label="New board" title="New board" aria-haspopup="menu" aria-expanded="false" aria-controls="newMenu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="menu" id="newMenu" role="menu" aria-label="New board difficulty" hidden>
+          <button class="menu-item" role="menuitemradio" data-d="easy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><strong>Easy</strong><span>8×8 to 10×10</span></button>
+          <button class="menu-item" role="menuitemradio" data-d="medium"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><strong>Medium</strong><span>11×11 to 13×13</span></button>
+          <button class="menu-item" role="menuitemradio" data-d="hard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><strong>Hard</strong><span>14×14 to 16×16</span></button>
+        </div>
+      </div>
     </div>
     <div class="stats">
       <div class="stat"><div class="stat-label">Level</div><div class="stat-value" id="level">1</div></div>
@@ -442,17 +471,6 @@
     <button class="btn secondary" id="retryBtn">Retry board</button>
     <button class="btn secondary" id="loseNewBtn">New board</button>
   </div>
-</dialog>
-
-<dialog id="newDlg">
-  <h2>New board</h2>
-  <p>Pick a difficulty. Your level stays the same.</p>
-  <div class="diffs">
-    <button class="diff" data-d="easy"><strong>Easy</strong><span>8×8 to 10×10</span></button>
-    <button class="diff" data-d="medium"><strong>Medium</strong><span>11×11 to 13×13</span></button>
-    <button class="diff" data-d="hard"><strong>Hard</strong><span>14×14 to 16×16</span></button>
-  </div>
-  <div class="actions"><button class="btn secondary" id="newCancel">Cancel</button></div>
 </dialog>
 
 <dialog id="settingsDlg">
@@ -739,7 +757,7 @@ const PALETTE = [
   ["#d9695f", "brick red"], ["#bcd6ef", "powder blue"], ["#7a8b3c", "olive"], ["#3f6fa8", "navy"],
 ];
 // Bump this whenever you ship a change.
-const VERSION = "1.0.0";
+const VERSION = "1.1.0";
 const DIFFICULTY = {
   easy:   { label: "Easy",   min: 8,  max: 10 },
   medium: { label: "Medium", min: 11, max: 13 },
@@ -1112,18 +1130,30 @@ function prepNextBoard() {
   startNewBoard();
 }
 
-$("newBtn").addEventListener("click", () => {
-  document.querySelectorAll(".diff").forEach(b => b.setAttribute("aria-current", b.dataset.d === S.difficulty));
-  $("newDlg").showModal();
-});
-document.querySelectorAll(".diff").forEach(b => b.addEventListener("click", () => {
-  $("newDlg").close();
+// ---------- New board dropdown ----------
+const newMenu = $("newMenu");
+function setMenu(open) {
+  newMenu.hidden = !open;
+  $("newBtn").setAttribute("aria-expanded", open);
+  if (open) {
+    newMenu.querySelectorAll(".menu-item").forEach(b => b.setAttribute("aria-checked", b.dataset.d === S.difficulty));
+  }
+}
+$("newBtn").addEventListener("click", () => setMenu(newMenu.hidden));
+newMenu.querySelectorAll(".menu-item").forEach(b => b.addEventListener("click", () => {
+  setMenu(false);
   S.difficulty = b.dataset.d;
   saveProgress();
   startNewBoard(b.dataset.d);
 }));
-$("newCancel").addEventListener("click", () => $("newDlg").close());
-$("newDlg").addEventListener("click", e => { if (e.target === $("newDlg")) $("newDlg").close(); }); // tap outside closes
+// A tap anywhere else just closes the menu (it doesn't also mark the board).
+document.addEventListener("pointerdown", e => {
+  if (newMenu.hidden || e.target.closest(".new-wrap")) return;
+  e.stopPropagation();
+  e.preventDefault();
+  setMenu(false);
+}, true);
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !newMenu.hidden) setMenu(false); });
 
 $("nextBtn").addEventListener("click", () => {
   $("winDlg").close();
