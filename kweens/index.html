@@ -145,7 +145,7 @@
     aspect-ratio: 1;
     border: 0;
     padding: 0;
-    border-radius: var(--r, 8px);
+    border-radius: 9%;
     background: var(--c);
     cursor: pointer;
     display: grid; place-items: center;
@@ -155,11 +155,11 @@
 
   /* One × style everywhere. */
   .cell svg.x {
-    width: 52%; height: 52%;
+    width: 84%; height: 84%;
     color: #fffaf3;
     pointer-events: none;
   }
-  .cell[data-st="w"] svg.x { color: var(--bad); width: 60%; height: 60%; filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 1px #fff); }
+  .cell[data-st="w"] svg.x { color: var(--bad); filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 1px #fff); }
 
   .queen {
     position: absolute;
@@ -237,6 +237,7 @@
   .history-row span { color: var(--ink-soft); font-weight: 600; font-size: 0.95rem; }
   .btn.small { flex: none; padding: 10px 14px; font-size: 0.95rem; background: #efe4dc; color: var(--ink); }
   .btn.small.armed { background: var(--bad); color: #fff; }
+  .version { margin: 14px 0 0; font-size: 0.85rem; font-weight: 600; color: var(--ink-soft); }
   #settingsDlg { max-height: calc(100dvh - 32px); overflow-y: auto; }
   .btn {
     border: 0;
@@ -273,6 +274,7 @@
     .rules { gap: 6px; padding: 8px; }
     .rule { flex-direction: column; text-align: center; font-size: 0.74rem; padding: 8px 6px; gap: 6px; }
     .pills { gap: 8px; }
+    .board { gap: var(--gap-sm, 3px); }
     .round { width: 48px; height: 48px; }
     .round svg { width: 22px; height: 22px; }
     .header-left { gap: 8px; }
@@ -374,6 +376,7 @@
   <div class="actions">
     <button class="btn" id="closeSettings">Done</button>
   </div>
+  <p class="version" id="versionText"></p>
 </dialog>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -596,6 +599,8 @@ const PALETTE = [
   ["#6fa8dc", "sky blue"], ["#e8935a", "tangerine"], ["#5bb5a8", "teal"], ["#b5ada1", "stone"],
   ["#d9695f", "brick red"], ["#bcd6ef", "powder blue"], ["#7a8b3c", "olive"], ["#3f6fa8", "navy"],
 ];
+// Bump this whenever you ship a change.
+const VERSION = "1.0.0";
 const MIN_N = 8, MAX_N = 16;
 const MAX_LIVES = 3, MAX_HINTS = 3;
 const TOUCH = matchMedia("(hover: none)").matches;
@@ -616,7 +621,7 @@ let cells = [];
 const $ = id => document.getElementById(id);
 const boardEl = $("board");
 
-const X_SVG = '<svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const X_SVG = '<svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M4.5 4.5l15 15M19.5 4.5l-15 15"/></svg>';
 const QUEEN_HTML = '<span class="queen"><svg viewBox="0 0 64 64"><use href="#cat"/></svg></span>';
 const HEART_SVG = '<svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.6-4.6-9.6-9.3C.9 8 3.2 4 7 4c2.1 0 3.8 1.2 5 3 1.2-1.8 2.9-3 5-3 3.8 0 6.1 4 4.6 7.7C19.6 16.4 12 21 12 21z"/></svg>';
 const MINI_CAT = '<svg viewBox="0 0 64 64"><use href="#cat"/></svg>';
@@ -727,7 +732,7 @@ function buildBoard() {
   boardEl.innerHTML = "";
   boardEl.style.setProperty("--n", n);
   boardEl.style.setProperty("--gap", n <= 9 ? "5px" : n <= 12 ? "4px" : "3px");
-  boardEl.style.setProperty("--r", n <= 9 ? "8px" : n <= 12 ? "6px" : "4px");
+  boardEl.style.setProperty("--gap-sm", n <= 9 ? "3px" : n <= 12 ? "2.5px" : "2px");
   boardEl.setAttribute("aria-label", `${n} by ${n} board`);
   cells = grid(n, null);
   const frag = document.createDocumentFragment();
@@ -982,7 +987,7 @@ function disarmClear() {
   $("clearBtn").textContent = "Clear history";
 }
 $("settingsBtn").addEventListener("click", () => {
-  $("progressText").textContent = `You're on level ${S.level}`;
+  $("progressText").textContent = `Level ${S.level}`;
   disarmClear();
   $("settingsDlg").showModal();
 });
@@ -1015,6 +1020,7 @@ document.querySelectorAll(".mini").forEach(m => {
   m.setAttribute("aria-hidden", "true");
 });
 
+$("versionText").textContent = `Kweens v${VERSION}`;
 loadProgress();
 startNewBoard();
 </script>
