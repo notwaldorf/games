@@ -237,6 +237,21 @@
   .history-row span { color: var(--ink-soft); font-weight: 600; font-size: 0.95rem; }
   .btn.small { flex: none; padding: 10px 14px; font-size: 0.95rem; background: #efe4dc; color: var(--ink); }
   .btn.small.armed { background: var(--bad); color: #fff; }
+  .diffs { display: grid; gap: 10px; margin-bottom: 14px; }
+  .diff {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    width: 100%;
+    padding: 16px 18px;
+    border: 2px solid transparent;
+    border-radius: 16px;
+    background: var(--tile);
+    cursor: pointer;
+    text-align: left;
+  }
+  .diff strong { font-size: 1.15rem; font-weight: 800; }
+  .diff span { color: var(--ink-soft); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .diff[aria-current="true"] { border-color: var(--ink); background: #fffaf5; }
+  .diff:active { transform: scale(0.98); }
   .version { margin: 14px 0 0; font-size: 0.85rem; font-weight: 600; color: var(--ink-soft); }
   #settingsDlg { max-height: calc(100dvh - 32px); overflow-y: auto; }
   .btn {
@@ -270,6 +285,48 @@
   .switch:checked { background: var(--good); }
   .switch:checked::after { transform: translateX(20px); }
 
+  /* ---------- Color test page (#colors) ---------- */
+  [hidden] { display: none !important; }
+  .lab { width: 100%; max-width: 1100px; padding: 24px 16px 56px; }
+  .lab h1 { font-size: 2rem; font-weight: 800; margin: 0 0 4px; }
+  .lab h2 { font-size: 1.3rem; font-weight: 800; margin: 36px 0 4px; }
+  .lab .note { color: var(--ink-soft); margin: 0 0 14px; max-width: 64ch; line-height: 1.45; font-weight: 600; }
+  .lab .back { color: var(--ink); font-weight: 800; }
+  .lab-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 16px; }
+  .lab-bar label {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--card); padding: 8px 14px; border-radius: 999px;
+    box-shadow: var(--shadow); font-weight: 700;
+  }
+  .lab-bar select { font: inherit; color: inherit; border: 0; background: var(--tile); border-radius: 8px; padding: 4px 6px; }
+  .lab-bar input[type="range"] { accent-color: var(--ink); }
+  .lab-bar output { min-width: 2ch; font-variant-numeric: tabular-nums; }
+  .lab .btn { padding: 10px 18px; font-size: 0.95rem; }
+  .lab .cell { cursor: default; }
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+  .swatch { background: var(--card); border-radius: 16px; padding: 12px; box-shadow: var(--shadow); }
+  .swatch .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; margin-bottom: 10px; }
+  .swatch .meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 800; }
+  .swatch .hex { display: block; color: var(--ink-soft); font-size: 0.85rem; font-weight: 700; }
+  .swatch input[type="color"] { width: 36px; height: 30px; border: 0; padding: 0; background: none; cursor: pointer; flex: none; }
+  .matrix-wrap { overflow-x: auto; background: var(--card); border-radius: 16px; padding: 12px; box-shadow: var(--shadow); }
+  .matrix { border-collapse: separate; border-spacing: 3px; }
+  .matrix th { font-size: 0.78rem; font-weight: 700; color: var(--ink-soft); white-space: nowrap; }
+  .matrix tbody th { text-align: right; padding-right: 6px; }
+  .matrix .dot { display: inline-block; width: 18px; height: 18px; border-radius: 9%; background: var(--c); vertical-align: middle; }
+  .matrix tbody th .dot { margin-left: 6px; }
+  .pair { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 3px; border-radius: 8px; }
+  .two { display: flex; gap: 3px; }
+  .two span { width: 18px; height: 18px; border-radius: 9%; background: var(--c); }
+  .pair small { font-size: 0.7rem; color: var(--ink-soft); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .pair.warn { background: #fde3df; }
+  .pair.warn small { color: var(--bad); font-weight: 800; }
+  .closest { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+  .close-card { background: var(--card); border-radius: 14px; padding: 10px 12px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow); font-weight: 700; }
+  .close-card .two span { width: 36px; height: 36px; }
+  .close-card small { display: block; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .close-card.warn small { color: var(--bad); font-weight: 800; }
+
   @media (max-width: 460px) {
     .rules { gap: 6px; padding: 8px; }
     .rule { flex-direction: column; text-align: center; font-size: 0.74rem; padding: 8px 6px; gap: 6px; }
@@ -298,7 +355,7 @@
       <button class="round" id="restartBtn" aria-label="Restart this board" title="Restart this board">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v5h5"/></svg>
       </button>
-      <button class="round" id="newBtn" aria-label="New board" title="New board">
+      <button class="round" id="newBtn" aria-label="New board" title="New board" aria-haspopup="dialog">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
       </button>
     </div>
@@ -337,6 +394,39 @@
 
 </main>
 
+<!-- Color test page: open kweens.html#colors -->
+<section class="lab" id="colorLab" hidden>
+  <a class="back" href="#">← Back to the game</a>
+  <h1>Color test</h1>
+  <p class="note">Every board color, and every pair of colors side by side. Edits here are only a preview; copy the palette code into the game to keep them.</p>
+  <div class="lab-bar">
+    <label>Vision
+      <select id="labVision">
+        <option value="normal">Normal</option>
+        <option value="protanopia">Protanopia (red-blind)</option>
+        <option value="deuteranopia">Deuteranopia (green-blind)</option>
+        <option value="tritanopia">Tritanopia (blue-blind)</option>
+        <option value="grayscale">Grayscale</option>
+      </select>
+    </label>
+    <label>Flag pairs closer than <input type="range" id="labThreshold" min="5" max="45" value="25"> <output id="labThresholdOut">25</output></label>
+    <button class="btn" id="labCopy">Copy palette code</button>
+    <button class="btn secondary" id="labReset">Reset colors</button>
+  </div>
+
+  <h2>Colors</h2>
+  <p class="note">Each color empty, with an ×, with a cat, and with a wrong-square ×. Use the picker to try a new shade.</p>
+  <div class="swatches" id="labSwatches"></div>
+
+  <h2>Closest pairs</h2>
+  <p class="note" id="labSummary"></p>
+  <div class="closest" id="labClosest"></div>
+
+  <h2>Every pair</h2>
+  <p class="note">The number is how different two colors look (color difference, ΔE). Higher is easier to tell apart.</p>
+  <div class="matrix-wrap"><table class="matrix" id="labMatrix"></table></div>
+</section>
+
 <!-- Dialogs -->
 <dialog id="winDlg">
   <h2 id="winTitle">Level cleared</h2>
@@ -352,6 +442,17 @@
     <button class="btn secondary" id="retryBtn">Retry board</button>
     <button class="btn secondary" id="loseNewBtn">New board</button>
   </div>
+</dialog>
+
+<dialog id="newDlg">
+  <h2>New board</h2>
+  <p>Pick a difficulty. Your level stays the same.</p>
+  <div class="diffs">
+    <button class="diff" data-d="easy"><strong>Easy</strong><span>8×8 to 10×10</span></button>
+    <button class="diff" data-d="medium"><strong>Medium</strong><span>11×11 to 13×13</span></button>
+    <button class="diff" data-d="hard"><strong>Hard</strong><span>14×14 to 16×16</span></button>
+  </div>
+  <div class="actions"><button class="btn secondary" id="newCancel">Cancel</button></div>
 </dialog>
 
 <dialog id="settingsDlg">
@@ -638,8 +739,13 @@ const PALETTE = [
   ["#d9695f", "brick red"], ["#bcd6ef", "powder blue"], ["#7a8b3c", "olive"], ["#3f6fa8", "navy"],
 ];
 // Bump this whenever you ship a change.
-const VERSION = "1.0.1";
-const MIN_N = 8, MAX_N = 16;
+const VERSION = "1.0.0";
+const DIFFICULTY = {
+  easy:   { label: "Easy",   min: 8,  max: 10 },
+  medium: { label: "Medium", min: 11, max: 13 },
+  hard:   { label: "Hard",   min: 14, max: 16 },
+};
+const DEFAULT_DIFFICULTY = "easy";
 const MAX_LIVES = 3, MAX_HINTS = 3;
 const TOUCH = matchMedia("(hover: none)").matches;
 const TAP = TOUCH ? "Tap" : "Click", DTAP = TOUCH ? "Double-tap" : "Double-click";
@@ -652,7 +758,7 @@ const S = {
   n: 8, reg: null, sol: null, colors: null,
   queen: null, mark: null,          // mark: 0 none, 1 crossed out by you, 2 wrong guess
   lives: MAX_LIVES, hints: MAX_HINTS, placed: 0, over: false,
-  autoMark: true,
+  autoMark: true, difficulty: DEFAULT_DIFFICULTY,
 };
 let cells = [];
 
@@ -664,14 +770,8 @@ const QUEEN_HTML = '<span class="queen"><svg viewBox="0 0 64 64"><use href="#cat
 const HEART_SVG = '<svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.6-4.6-9.6-9.3C.9 8 3.2 4 7 4c2.1 0 3.8 1.2 5 3 1.2-1.8 2.9-3 5-3 3.8 0 6.1 4 4.6 7.7C19.6 16.4 12 21 12 21z"/></svg>';
 const MINI_CAT = '<svg viewBox="0 0 64 64"><use href="#cat"/></svg>';
 
-function isDark(hex) {
-  const v = parseInt(hex.slice(1), 16);
-  const r = v >> 16, g = (v >> 8) & 255, b = v & 255;
-  return 0.299 * r + 0.587 * g + 0.114 * b < 150;
-}
-
 // ---------- Saved progress ----------
-// Your level and the auto-× setting are kept in localStorage. If storage is blocked, the game still works; it
+// Your level, difficulty and the auto-× setting are kept in localStorage. If storage is blocked, the game still works; it
 // just won't remember anything between visits.
 const STORE_KEY = "kweens-progress";
 const OLD_STORE_KEY = "queens-cats-progress"; // from before the rename
@@ -683,19 +783,19 @@ const store = {
   save(data) { try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) {} },
 };
 function saveProgress(level = S.level) {
-  store.save({ level, autoMark: S.autoMark });
+  store.save({ level, difficulty: S.difficulty, autoMark: S.autoMark });
 }
 function loadProgress() {
   const saved = store.load();
   S.level = Number.isInteger(saved.level) && saved.level > 0 ? saved.level : 1;
   if (typeof saved.autoMark === "boolean") S.autoMark = saved.autoMark;
+  if (DIFFICULTY[saved.difficulty]) S.difficulty = saved.difficulty;
   $("autoMark").checked = S.autoMark;
 }
 
 // ---------- Board lifecycle ----------
 // Big boards can take a moment to generate, so it happens in a background
 // worker, and the next board is always being prepared while you play.
-const randomSize = () => MIN_N + rand(MAX_N - MIN_N + 1);
 let worker = null, jobId = 0;
 const pending = new Map();
 
@@ -731,18 +831,30 @@ function makeBoard(n) {
   });
 }
 
-let upcoming = makeBoard(randomSize());
-let busy = false;
+// One board per difficulty is kept ready, so switching is instant too.
+const ready = {};
+function prefetch(d) {
+  if (!ready[d]) {
+    const { min, max } = DIFFICULTY[d];
+    ready[d] = makeBoard(min + rand(max - min + 1));
+  }
+}
 
-async function startNewBoard() {
-  if (busy) return;
+let busy = false, queued = null;
+
+async function startNewBoard(d = S.difficulty) {
+  if (busy) { queued = d; return; }
   busy = true;
+  S.difficulty = d;
   boardEl.classList.remove("cheer");
   boardEl.setAttribute("aria-busy", "true");
   boardEl.style.opacity = "0.35";
   setStatus("Building a new board…");
-  const puzzle = await upcoming;
-  upcoming = makeBoard(randomSize());
+  prefetch(d);
+  const puzzle = await ready[d];
+  ready[d] = null;
+  prefetch(d); // the current difficulty goes to the front of the queue
+  for (const other of Object.keys(DIFFICULTY)) prefetch(other);
   S.n = puzzle.n;
   S.reg = puzzle.regions;
   S.sol = puzzle.solution;
@@ -751,6 +863,7 @@ async function startNewBoard() {
   boardEl.removeAttribute("aria-busy");
   busy = false;
   resetBoard();
+  if (queued) { const next = queued; queued = null; startNewBoard(next); }
 }
 
 function resetBoard() {
@@ -999,7 +1112,18 @@ function prepNextBoard() {
   startNewBoard();
 }
 
-$("newBtn").addEventListener("click", prepNextBoard);
+$("newBtn").addEventListener("click", () => {
+  document.querySelectorAll(".diff").forEach(b => b.setAttribute("aria-current", b.dataset.d === S.difficulty));
+  $("newDlg").showModal();
+});
+document.querySelectorAll(".diff").forEach(b => b.addEventListener("click", () => {
+  $("newDlg").close();
+  S.difficulty = b.dataset.d;
+  saveProgress();
+  startNewBoard(b.dataset.d);
+}));
+$("newCancel").addEventListener("click", () => $("newDlg").close());
+$("newDlg").addEventListener("click", e => { if (e.target === $("newDlg")) $("newDlg").close(); }); // tap outside closes
 
 $("nextBtn").addEventListener("click", () => {
   $("winDlg").close();
@@ -1059,8 +1183,141 @@ document.querySelectorAll(".mini").forEach(m => {
 });
 
 $("versionText").textContent = `Kweens v${VERSION}`;
-loadProgress();
-startNewBoard();
+
+// =====================================================================
+//  Color test page (kweens.html#colors)
+// =====================================================================
+// Color-vision simulation matrices (Machado et al. 2009, full severity),
+// applied to linear RGB.
+const VISION = {
+  normal: null,
+  protanopia: [0.152286, 1.052583, -0.204868, 0.114503, 0.786281, 0.099216, -0.003882, -0.048116, 1.051998],
+  deuteranopia: [0.367322, 0.860646, -0.227968, 0.280085, 0.672501, 0.047413, -0.011820, 0.042940, 0.968881],
+  tritanopia: [1.255528, -0.076749, -0.178779, -0.078411, 0.930809, 0.147602, 0.004733, 0.691367, 0.303900],
+  grayscale: "gray",
+};
+const hexToRgb = h => { const v = parseInt(h.slice(1), 16); return [v >> 16, (v >> 8) & 255, v & 255]; };
+const toLinear = c => (c /= 255) <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+const toSrgb = c => {
+  c = Math.min(1, Math.max(0, c));
+  return Math.round(255 * (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055));
+};
+
+function simulate(hex, mode) {
+  const m = VISION[mode];
+  if (!m) return hex;
+  const [r, g, b] = hexToRgb(hex).map(toLinear);
+  let out;
+  if (m === "gray") { const y = 0.2126 * r + 0.7152 * g + 0.0722 * b; out = [y, y, y]; }
+  else out = [m[0] * r + m[1] * g + m[2] * b, m[3] * r + m[4] * g + m[5] * b, m[6] * r + m[7] * g + m[8] * b];
+  return "#" + out.map(toSrgb).map(v => v.toString(16).padStart(2, "0")).join("");
+}
+
+function toLab(hex) {
+  const [r, g, b] = hexToRgb(hex).map(toLinear);
+  const f = t => t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116;
+  const x = f((0.4124 * r + 0.3576 * g + 0.1805 * b) / 0.95047);
+  const y = f(0.2126 * r + 0.7152 * g + 0.0722 * b);
+  const z = f((0.0193 * r + 0.1192 * g + 0.9505 * b) / 1.08883);
+  return [116 * y - 16, 500 * (x - y), 200 * (y - z)];
+}
+// Rounded to one decimal so the flag always agrees with the number shown.
+const deltaE = (a, b) => { const p = toLab(a), q = toLab(b); return Math.round(Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]) * 10) / 10; };
+
+function initColorLab() {
+  document.querySelector(".app").hidden = true;
+  $("colorLab").hidden = false;
+  document.title = "Kweens color test";
+  const lab = { colors: PALETTE.map(([hex, name]) => ({ hex, name })), vision: "normal", threshold: 25 };
+  const shown = i => simulate(lab.colors[i].hex, lab.vision);
+
+  function renderSwatches() {
+    $("labSwatches").innerHTML = lab.colors.map((col, i) => `
+      <div class="swatch">
+        <div class="tiles">
+          <div class="cell" style="--c:${shown(i)}"></div>
+          <div class="cell" data-st="x" style="--c:${shown(i)}">${X_SVG}</div>
+          <div class="cell" style="--c:${shown(i)}">${QUEEN_HTML}</div>
+          <div class="cell" data-st="w" style="--c:${shown(i)}">${X_SVG}</div>
+        </div>
+        <div class="meta">
+          <span>${col.name}<span class="hex">${col.hex}</span></span>
+          <input type="color" value="${col.hex}" data-i="${i}" aria-label="Change ${col.name}">
+        </div>
+      </div>`).join("");
+    $("labSwatches").querySelectorAll('input[type="color"]').forEach(inp => inp.addEventListener("input", e => {
+      lab.colors[+e.target.dataset.i].hex = e.target.value;
+      renderPairs();
+      // Update just this swatch's tiles and label so the picker stays open.
+      const card = e.target.closest(".swatch"), i = +e.target.dataset.i;
+      card.querySelectorAll(".cell").forEach(c => c.style.setProperty("--c", shown(i)));
+      card.querySelector(".hex").textContent = lab.colors[i].hex;
+    }));
+  }
+
+  function renderPairs() {
+    const n = lab.colors.length;
+    const d = (i, j) => deltaE(shown(i), shown(j));
+    const pairs = [];
+    for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) pairs.push({ i, j, e: d(i, j) });
+    pairs.sort((a, b) => a.e - b.e);
+    const flagged = pairs.filter(p => p.e < lab.threshold).length;
+    $("labSummary").textContent = flagged
+      ? `${flagged} ${flagged === 1 ? "pair is" : "pairs are"} closer than ${lab.threshold} and may be hard to tell apart on the board.`
+      : `No pairs are closer than ${lab.threshold}.`;
+    $("labClosest").innerHTML = pairs.slice(0, 8).map(p => `
+      <div class="close-card ${p.e < lab.threshold ? "warn" : ""}">
+        <div class="two"><span style="--c:${shown(p.i)}"></span><span style="--c:${shown(p.j)}"></span></div>
+        <div>${lab.colors[p.i].name} and ${lab.colors[p.j].name}<small>ΔE ${p.e.toFixed(1)}</small></div>
+      </div>`).join("");
+
+    let html = "<thead><tr><th></th>" +
+      lab.colors.map((c, j) => `<th title="${c.name}"><span class="dot" style="--c:${shown(j)}"></span></th>`).join("") +
+      "</tr></thead><tbody>";
+    for (let i = 0; i < n; i++) {
+      html += `<tr><th>${lab.colors[i].name}<span class="dot" style="--c:${shown(i)}"></span></th>`;
+      for (let j = 0; j < n; j++) {
+        if (i === j) { html += "<td></td>"; continue; }
+        const e = d(i, j);
+        html += `<td><div class="pair ${e < lab.threshold ? "warn" : ""}" title="${lab.colors[i].name} and ${lab.colors[j].name}">
+          <div class="two"><span style="--c:${shown(i)}"></span><span style="--c:${shown(j)}"></span></div>
+          <small>${Math.round(e)}</small></div></td>`;
+      }
+      html += "</tr>";
+    }
+    $("labMatrix").innerHTML = html + "</tbody>";
+  }
+
+  $("labVision").addEventListener("change", e => { lab.vision = e.target.value; renderSwatches(); renderPairs(); });
+  $("labThreshold").addEventListener("input", e => {
+    lab.threshold = +e.target.value;
+    $("labThresholdOut").textContent = lab.threshold;
+    renderPairs();
+  });
+  $("labReset").addEventListener("click", () => {
+    lab.colors = PALETTE.map(([hex, name]) => ({ hex, name }));
+    renderSwatches(); renderPairs();
+  });
+  $("labCopy").addEventListener("click", async () => {
+    const code = "const PALETTE = [\n" + lab.colors.map(c => `  ["${c.hex}", "${c.name}"],`).join("\n") + "\n];";
+    try { await navigator.clipboard.writeText(code); $("labCopy").textContent = "Copied"; }
+    catch (e) { window.prompt("Copy this into the game:", code); }
+    setTimeout(() => ($("labCopy").textContent = "Copy palette code"), 1500);
+  });
+
+  renderSwatches();
+  renderPairs();
+}
+
+// Switching between the game and the color page reloads, so each starts clean.
+window.addEventListener("hashchange", () => location.reload());
+
+if (location.hash === "#colors") {
+  initColorLab();
+} else {
+  loadProgress();
+  startNewBoard();
+}
 </script>
 </body>
 </html>
