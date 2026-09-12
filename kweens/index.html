@@ -383,8 +383,8 @@
         </button>
         <div class="menu" id="newMenu" role="menu" aria-label="New board difficulty" hidden>
           <button class="menu-item" role="menuitemradio" data-d="easy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><strong>Easy</strong><span>8×8 to 10×10</span></button>
-          <button class="menu-item" role="menuitemradio" data-d="medium"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><strong>Medium</strong><span>11×11 to 13×13</span></button>
-          <button class="menu-item" role="menuitemradio" data-d="hard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><strong>Hard</strong><span>14×14 to 16×16</span></button>
+          <button class="menu-item" role="menuitemradio" data-d="medium"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><strong>Medium</strong><span>11×11 to 12×12</span></button>
+          <button class="menu-item" role="menuitemradio" data-d="hard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><strong>Hard</strong><span>13×13 to 14×14</span></button>
         </div>
       </div>
     </div>
@@ -506,6 +506,9 @@
   </defs>
 </svg>
 
+<!-- Guess-free solver: kept in its own file so it's easy to track. Loaded here
+     for main-thread generation, and pulled into the Web Worker via importScripts. -->
+<script src="deduce.js"></script>
 <script id="gen-src">
 // =====================================================================
 //  Puzzle generation (also runs inside a Web Worker, see makeBoard)
@@ -591,7 +594,7 @@ function growRegions(n, sol) {
 }
 
 // Find up to `limit` solutions. Always branches on the most constrained
-// row / column / region, which keeps it fast even on 16x16 boards.
+// row / column / region, which keeps it fast even on 14x14 boards.
 // Returns null if the search runs past its step budget.
 function solve(n, reg, limit = 2, budget = 60000) {
   let steps = 0;
@@ -733,8 +736,9 @@ function generate(n) {
         rebalance(n, reg, sol, 15 * n, fixed);
         const size = new Array(n).fill(0);
         for (const row of reg) for (const g of row) size[g]++;
-        // Only accept boards where the staircase sizes are unique to the staircase.
-        if (size.every((sz, g) => fixed[g] || sz >= minFree)) return { regions: reg, solution: sol };
+        // Only keep boards that are (a) staircase-shaped and (b) solvable by pure
+        // deduction — no guessing. deduceSolvable comes from deduce.js.
+        if (size.every((sz, g) => fixed[g] || sz >= minFree) && deduceSolvable(n, reg)) return { regions: reg, solution: sol };
         break;
       }
       const alt = sols.find(s => s.some((c, r) => c !== sol[r]));
@@ -757,11 +761,11 @@ const PALETTE = [
   ["#d9695f", "brick red"], ["#bcd6ef", "powder blue"], ["#7a8b3c", "olive"], ["#3f6fa8", "navy"],
 ];
 // Bump this whenever you ship a change.
-const VERSION = "1.1.0";
+const VERSION = "1.2.0";
 const DIFFICULTY = {
   easy:   { label: "Easy",   min: 8,  max: 10 },
-  medium: { label: "Medium", min: 11, max: 13 },
-  hard:   { label: "Hard",   min: 14, max: 16 },
+  medium: { label: "Medium", min: 11, max: 12 },
+  hard:   { label: "Hard",   min: 13, max: 14 },
 };
 const DEFAULT_DIFFICULTY = "easy";
 const MAX_LIVES = 3, MAX_HINTS = 3;
@@ -824,7 +828,10 @@ function generateHere(n) {
 }
 
 try {
-  const src = document.getElementById("gen-src").textContent +
+  // The worker needs the guess-free solver too; importScripts needs an absolute URL.
+  const deduceURL = new URL("deduce.js", document.baseURI).href;
+  const src = "importScripts(" + JSON.stringify(deduceURL) + ");\n" +
+    document.getElementById("gen-src").textContent +
     "\nself.onmessage = e => { let p = null; while (!p) p = generate(e.data.n); self.postMessage({ id: e.data.id, puzzle: p }); };";
   worker = new Worker(URL.createObjectURL(new Blob([src], { type: "text/javascript" })));
   worker.onmessage = e => {
