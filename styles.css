@@ -1,0 +1,63 @@
+:root { --sky: #DCEBFF; --ink: #2B2560; --pink: #FF8FC0; --lemon: #FFD84D; --white: #FFFFFF; }
+* { box-sizing: border-box; }
+body {
+  margin: 0; min-height: 100vh;
+  font-family: "Baloo 2", system-ui, sans-serif; font-weight: 600; color: var(--ink);
+  background: var(--sky) radial-gradient(rgba(43, 37, 96, .09) 1.6px, transparent 1.7px) 0 0 / 22px 22px;
+}
+.wrap { max-width: 1000px; margin: 0 auto; padding: 48px 24px; display: grid; grid-template-columns: 1fr auto; gap: 48px; align-items: start; }
+
+h1 { display: flex; align-items: center; gap: 14px; margin: 0 0 10px; font-size: clamp(2.6rem, 7vw, 4.4rem); font-weight: 800; line-height: 1; }
+h1 svg { width: .8em; height: .8em; flex: none; }
+.subtitle { margin: 0 0 36px; font-size: 1.25rem; line-height: 1.4; max-width: 40ch; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 28px; }
+.tile { display: flex; flex-direction: column; text-decoration: none; color: inherit; background: var(--white); border: 4px solid var(--ink); border-radius: 50% 50% 26px 26px / 80px 80px 26px 26px; overflow: hidden; box-shadow: 0 6px 0 var(--ink); transition: transform .15s ease; }
+.tile:hover { transform: translateY(-4px) rotate(-1.5deg); }
+.tile:focus-visible { outline: 4px dashed var(--ink); outline-offset: 6px; }
+.tile-top { height: 120px; background: var(--c); border-bottom: 4px solid var(--ink); display: grid; place-items: center; font-size: 3.4rem; padding-top: 10px; }
+.tile-body { flex: 1; padding: 12px 16px 18px; text-align: center; }
+.tile h2 { margin: 0 0 4px; font-size: 1.4rem; font-weight: 800; line-height: 1.1; }
+.tile p { margin: 0; font-size: 1rem; line-height: 1.35; opacity: .8; }
+
+.picker { display: flex; flex-direction: column; align-items: center; width: 240px; padding-top: 8px; }
+.machine { background: none; border: 0; padding: 0; cursor: pointer; width: 100%; border-radius: 24px; }
+.machine:disabled { cursor: wait; }
+.machine:focus-visible { outline: 4px dashed var(--ink); outline-offset: 8px; }
+.machine svg { display: block; width: 100%; height: auto; }
+#knob { transform-box: fill-box; transform-origin: center; transition: transform .6s cubic-bezier(.3, 1.4, .5, 1); }
+.machine:hover:not(:disabled) #knob { transform: rotate(-20deg); }
+.ball-inner { transform-box: fill-box; transform-origin: center; }
+.shaking .ball-inner { animation: jiggle .6s ease-in-out; }
+@keyframes jiggle {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  25% { transform: translate(-3px, -5px) rotate(-14deg); }
+  50% { transform: translate(3px, -2px) rotate(10deg); }
+  75% { transform: translate(-2px, -4px) rotate(-6deg); }
+}
+
+.prize { min-height: 110px; width: 100%; display: flex; justify-content: center; align-items: flex-start; padding-top: 14px; }
+.prize-hint { margin: 0; opacity: .7; }
+.ball { width: 60px; height: 60px; border-radius: 50%; border: 4px solid var(--ink); overflow: hidden; display: flex; flex-direction: column; animation: drop .7s ease-out both; }
+.ball span { flex: 1; }
+.ball .top { background: var(--c); border-bottom: 4px solid var(--ink); }
+.ball .bottom { background: var(--white); }
+@keyframes drop {
+  0% { transform: translateY(-70px) scale(.6); opacity: 0; }
+  50% { transform: translateY(0) scale(1); opacity: 1; }
+  72% { transform: translateY(-14px); }
+  100% { transform: translateY(0); }
+}
+.prize-card { display: flex; gap: 12px; align-items: center; width: 100%; text-decoration: none; color: inherit; background: var(--white); border: 4px solid var(--ink); border-radius: 999px; padding: 6px 18px 6px 6px; box-shadow: 0 5px 0 var(--ink); animation: pop .35s cubic-bezier(.3, 1.5, .5, 1) both; }
+.prize-card:focus-visible { outline: 4px dashed var(--ink); outline-offset: 4px; }
+@keyframes pop { from { transform: scale(.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.prize-icon { flex: none; width: 52px; height: 52px; border-radius: 50%; background: var(--c); border: 4px solid var(--ink); display: grid; place-items: center; font-size: 1.6rem; }
+.prize-card strong { font-size: 1.25rem; font-weight: 800; line-height: 1.1; }
+
+@media (max-width: 720px) {
+  .wrap { grid-template-columns: 1fr; gap: 24px; padding-top: 32px; }
+  .picker { justify-self: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
