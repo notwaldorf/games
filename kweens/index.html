@@ -87,16 +87,16 @@
   .pill {
     background: var(--card);
     border-radius: 999px;
-    padding: 6px 18px;
-    min-height: 50px;
-    display: flex; align-items: center; gap: 10px;
+    padding: 6px 14px;
+    min-height: 46px;
+    display: flex; align-items: center; gap: 8px;
     box-shadow: var(--shadow);
   }
-  .pill .cat-icon { width: 34px; height: 34px; }
-  .count { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .pill .cat-icon { width: 30px; height: 30px; }
+  .count { font-size: 1.3rem; font-weight: 800; font-variant-numeric: tabular-nums; }
   .count .placed { color: var(--good); }
   .hearts { display: flex; gap: 6px; }
-  .heart { width: 30px; height: 30px; transition: transform 0.2s, opacity 0.3s; }
+  .heart { width: 26px; height: 26px; transition: transform 0.2s, opacity 0.3s; }
   .heart path { fill: var(--heart); transition: fill 0.3s; }
   .heart.lost { opacity: 0.55; }
   .heart.lost path { fill: #dccfc7; }
@@ -225,7 +225,7 @@
   button.pill { border: 0; cursor: pointer; transition: transform 0.1s, opacity 0.2s; }
   button.pill:active { transform: scale(0.95); }
   button.pill:disabled { cursor: not-allowed; opacity: 0.45; }
-  .hint-icon { width: 30px; height: 30px; }
+  .hint-icon { width: 26px; height: 26px; }
 
   /* ---------- Dialogs ---------- */
   dialog {
@@ -378,17 +378,18 @@
   @media (max-width: 460px) {
     .rules { gap: 6px; padding: 8px; }
     .rule { flex-direction: column; text-align: center; font-size: 0.74rem; padding: 8px 6px; gap: 6px; }
-    .pills { gap: 8px; }
+    .pills { gap: 6px; }
     .board { gap: var(--gap-sm, 3px); }
-    .round { width: 48px; height: 48px; }
+    .round { width: 44px; height: 44px; }
     .round svg { width: 22px; height: 22px; }
     .header-left { gap: 8px; }
     .stats { gap: 20px; }
     .stat-value { font-size: 1.55rem; }
-    .pill { padding: 5px 13px; min-height: 46px; gap: 8px; }
-    .hint-icon { width: 26px; height: 26px; }
-    .heart { width: 26px; height: 26px; }
-    .pill .cat-icon { width: 30px; height: 30px; }
+    .pill { padding: 5px 11px; min-height: 44px; gap: 6px; }
+    .count { font-size: 1.2rem; }
+    .hint-icon { width: 24px; height: 24px; }
+    .heart { width: 24px; height: 24px; }
+    .pill .cat-icon { width: 28px; height: 28px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -791,7 +792,7 @@ const PALETTE = [
   ["#d9695f", "brick red"], ["#bcd6ef", "powder blue"], ["#7a8b3c", "olive"], ["#3f6fa8", "navy"],
 ];
 // Bump this whenever you ship a change.
-const VERSION = "1.3.1";
+const VERSION = "1.3.3";
 const DIFFICULTY = {
   easy:   { label: "Easy",   min: 8,  max: 10 },
   medium: { label: "Medium", min: 11, max: 12 },
