@@ -8,7 +8,7 @@ const PALETTE = [
   ["#d9695f", "brick red"], ["#bcd6ef", "powder blue"], ["#7a8b3c", "olive"], ["#3f6fa8", "navy"],
 ];
 // Bump this whenever you ship a change.
-const VERSION = "1.3.4";
+const VERSION = "1.3.5";
 const DIFFICULTY = {
   easy:   { label: "Easy",   min: 8,  max: 10 },
   medium: { label: "Medium", min: 11, max: 12 },
