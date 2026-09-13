@@ -791,7 +791,7 @@ const PALETTE = [
   ["#d9695f", "brick red"], ["#bcd6ef", "powder blue"], ["#7a8b3c", "olive"], ["#3f6fa8", "navy"],
 ];
 // Bump this whenever you ship a change.
-const VERSION = "1.3.0";
+const VERSION = "1.3.1";
 const DIFFICULTY = {
   easy:   { label: "Easy",   min: 8,  max: 10 },
   medium: { label: "Medium", min: 11, max: 12 },
@@ -1045,7 +1045,9 @@ function autoCross() {
   if (!S.autoMark) return;
   const blocked = computeBlocked();
   for (let r = 0; r < S.n; r++) for (let c = 0; c < S.n; c++) {
-    if (blocked[r][c] && !S.queen[r][c] && S.mark[r][c] === 0) { S.mark[r][c] = 1; S.auto[r][c] = true; }
+    // A cat now rules this square out. Give empty squares a locked ×, and promote your own
+    // hand-drawn × to a locked one too, so it fades along with the rest.
+    if (blocked[r][c] && !S.queen[r][c] && S.mark[r][c] !== 2) { S.mark[r][c] = 1; S.auto[r][c] = true; }
   }
 }
 
