@@ -164,7 +164,7 @@
      locked/"for sure" vs. the tentative ×s you place yourself. The × itself stays crisp.
      We mix toward a warm grey (not toward transparent) so pale colours desaturate visibly
      instead of just lightening — otherwise a faded pale blue looks like a real pale blue. */
-  .cell[data-st="xa"] { background: color-mix(in srgb, var(--c) 45%, #cbbfb4); opacity: 0.2; cursor: default; }
+  .cell[data-st="xa"] { background: color-mix(in srgb, var(--c) 45%, #cbbfb4); opacity: 0.4; cursor: default; }
   @media (hover: hover) { .cell[data-st="xa"]:hover { filter: none; } }
 
   /* Pencil marks: small sudoku-style notes tucked in the top-right corner. They stay
