@@ -167,9 +167,11 @@
     pointer-events: none;
   }
   .cell[data-st="w"] svg.x { color: var(--bad); filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 1px #fff); }
-  /* Squares a cat already ruled out (auto ×) get a faded background, so they read as
-     locked/"for sure" vs. the tentative ×s you place yourself. The × itself stays crisp. */
-  .cell[data-st="xa"] { background: color-mix(in srgb, var(--c) 50%, transparent); cursor: default; }
+  /* Squares a cat already ruled out (auto ×) get a muted background, so they read as
+     locked/"for sure" vs. the tentative ×s you place yourself. The × itself stays crisp.
+     We mix toward a warm grey (not toward transparent) so pale colours desaturate visibly
+     instead of just lightening — otherwise a faded pale blue looks like a real pale blue. */
+  .cell[data-st="xa"] { background: color-mix(in srgb, var(--c) 45%, #cbbfb4); cursor: default; }
   @media (hover: hover) { .cell[data-st="xa"]:hover { filter: none; } }
 
   /* Pencil marks: small sudoku-style notes tucked in the top-right corner. They stay
@@ -792,7 +794,7 @@ const PALETTE = [
   ["#d9695f", "brick red"], ["#bcd6ef", "powder blue"], ["#7a8b3c", "olive"], ["#3f6fa8", "navy"],
 ];
 // Bump this whenever you ship a change.
-const VERSION = "1.3.3";
+const VERSION = "1.3.4";
 const DIFFICULTY = {
   easy:   { label: "Easy",   min: 8,  max: 10 },
   medium: { label: "Medium", min: 11, max: 12 },
